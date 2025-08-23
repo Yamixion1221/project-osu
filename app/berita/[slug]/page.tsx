@@ -7,9 +7,21 @@ interface Props {
   params: Promise<{ slug: string }>;
 }
 
+interface PostDetailType {
+  id: number;
+  slug: string;
+  title: { rendered: string };
+  content: { rendered: string };
+  date: string;
+  _embedded?: {
+    author?: { name: string }[];
+    "wp:featuredmedia"?: { source_url: string }[];
+  };
+}
+
 export default function PostDetail({ params }: Props) {
   const { slug } = use(params); // unwrap params
-  const [post, setPost] = useState<any>(null);
+  const [post, setPost] = useState<PostDetailType | null>(null);
 
   useEffect(() => {
     fetch(`https://arara.rf.gd/wp-json/wp/v2/posts?slug=${slug}&_embed`)
