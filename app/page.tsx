@@ -3,8 +3,19 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 
+interface Post {
+  id: number;
+  slug: string;
+  title: { rendered: string };
+  date: string;
+  _embedded?: {
+    author?: { name: string }[];
+    "wp:featuredmedia"?: { source_url: string }[];
+  };
+}
+
 export default function HomePage() {
-  const [posts, setPosts] = useState<any[]>([]);
+  const [posts, setPosts] = useState<Post[]>([]);
 
   useEffect(() => {
     fetch("https://arara.rf.gd/wp-json/wp/v2/posts?_embed")
@@ -16,7 +27,6 @@ export default function HomePage() {
     <main className="container mx-auto px-6 py-8 relative z-0">
       <h2 className="bg-header text-2xl font-bold text-center py-2 mb-6">Berita</h2>
 
-      {/* Grid Berita */}
       <div className="post-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 relative z-0">
         {posts.map(post => (
           <Link
@@ -24,7 +34,6 @@ export default function HomePage() {
             href={`/berita/${post.slug}`}
             className="post-card block relative z-0 cursor-pointer rounded-lg overflow-hidden shadow hover:scale-105 transition-transform"
           >
-            {/* Thumbnail */}
             {post._embedded?.["wp:featuredmedia"]?.[0]?.source_url && (
               <div className="w-full h-48 relative">
                 <Image
@@ -38,7 +47,6 @@ export default function HomePage() {
               </div>
             )}
 
-            {/* Konten */}
             <div className="p-4">
               <h3
                 dangerouslySetInnerHTML={{ __html: post.title.rendered }}
@@ -53,7 +61,6 @@ export default function HomePage() {
         ))}
       </div>
 
-      {/* Tombol lihat berita lainnya */}
       <div className="mt-6 text-center">
         <Link
           href="/berita"
