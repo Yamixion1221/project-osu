@@ -3,6 +3,7 @@ import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
+import { signIn } from "next-auth/react"; // <-- Tambahkan ini
 
 export default function Header() {
   const [openTurnamen, setOpenTurnamen] = useState(false);
@@ -63,7 +64,7 @@ export default function Header() {
               <Link href="/tim/standard" className="flex items-center gap-2 px-3 py-1 hover:text-blue-400">
                 <Image src="/icons/standard.png" alt="Standard" width={20} height={20} /> Standard
               </Link>
-              <Link href="/tim/catch-the-beat" className="flex items-center gap-2 px-3 py-1 hover:text-blue-400">
+              <Link href="/tim/ctb" className="flex items-center gap-2 px-3 py-1 hover:text-blue-400">
                 <Image src="/icons/ctb.png" alt="Catch the Beat" width={20} height={20} /> Catch the Beat
               </Link>
               <Link href="/tim/taiko" className="flex items-center gap-2 px-3 py-1 hover:text-blue-400">
@@ -91,10 +92,19 @@ export default function Header() {
               exit={{ opacity: 0, y: -10 }}
               className="absolute right-0 top-full mt-2 bg-gray-900 rounded shadow-lg w-40 overflow-hidden"
             >
-              <button className="flex items-center gap-2 w-full px-3 py-2 bg-pink-500 hover:bg-pink-600">
+              {/* osu! login */}
+              <button
+                onClick={() => signIn("osu")}
+                className="flex items-center gap-2 w-full px-3 py-2 bg-pink-500 hover:bg-pink-600"
+              >
                 <Image src="/icons/osu-logo.svg" alt="osu!" width={20} height={20} /> osu!
               </button>
-              <button className="flex items-center gap-2 w-full px-3 py-2 bg-red-500 hover:bg-red-600">
+
+              {/* Google login */}
+              <button
+                onClick={() => signIn("google")}
+                className="flex items-center gap-2 w-full px-3 py-2 bg-red-500 hover:bg-red-600"
+              >
                 <Image src="/icons/google-logo.svg" alt="Google" width={20} height={20} /> Google
               </button>
             </motion.div>
