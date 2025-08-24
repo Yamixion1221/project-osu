@@ -3,8 +3,19 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 
+interface Post {
+  id: number;
+  slug: string;
+  title: { rendered: string };
+  date: string;
+  _embedded?: {
+    author?: { name: string }[];
+    "wp:featuredmedia"?: { source_url: string }[];
+  };
+}
+
 export default function BeritaPage() {
-  const [posts, setPosts] = useState<any[]>([]);
+  const [posts, setPosts] = useState<Post[]>([]);
 
   useEffect(() => {
     fetch("https://arara.rf.gd/wp-json/wp/v2/posts?_embed")
