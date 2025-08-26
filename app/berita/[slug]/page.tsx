@@ -1,12 +1,10 @@
-"use client";
+import Image from "next/image";
 
-import { useEffect, useState, use } from "react";
-
-interface Props {
-  params: Promise<{ slug: string }>;
+interface PageProps {
+  params: { slug: string };
 }
 
-interface PostDetailType {
+interface PostType {
   id: number;
   slug: string;
   title: { rendered: string };
@@ -18,31 +16,29 @@ interface PostDetailType {
   };
 }
 
-export default function PostDetail({ params }: Props) {
-  const { slug } = use(params); // ✅ unwrap params pakai use()
-  const [post, setPost] = useState<PostDetailType | null>(null);
-  const [loading, setLoading] = useState(true);
+export default async function BeritaPage({ params }: PageProps) {
+  const res = await fetch(
+    `https://arara.rf.gd/wp-json/wp/v2/posts?slug=${params.slug}&_embed`,
+    { next: { revalidate: 60 } }
+  );
+  const data: PostType[] = await res.json();
+  const post = data[0];
 
-  useEffect(() => {
-    fetch(`https://arara.rf.gd/wp-json/wp/v2/posts?slug=${slug}&_embed`)
-      .then((res) => res.json())
-      .then((data) => setPost(data[0]))
-      .finally(() => setLoading(false));
-  }, [slug]);
-
-  if (loading) return <p className="text-center py-8">Loading...</p>;
-  if (!post) return <p className="text-center py-8">Post tidak ditemukan.</p>;
+  if (!post) {
+    return <h1 className="text-center mt-20 text-2xl">Halaman tidak ditemukan</h1>;
+  }
 
   return (
     <main className="container mx-auto px-6 py-8">
       {post._embedded?.["wp:featuredmedia"]?.[0]?.source_url && (
-        <img
+        <Image
           src={post._embedded["wp:featuredmedia"][0].source_url}
           alt={post.title.rendered}
+          width={800}
+          height={400}
           className="w-full h-72 object-cover rounded-lg mb-6"
         />
       )}
-
       <h1
         dangerouslySetInnerHTML={{ __html: post.title.rendered }}
         className="text-3xl font-bold mb-4"
