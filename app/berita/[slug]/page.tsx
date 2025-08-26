@@ -1,10 +1,14 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { use } from "react";
 import Image from "next/image";
 
-interface PageProps {
-  params: { slug: string };
+interface Props {
+  params: Promise<{ slug: string }>;
 }
 
-interface PostType {
+interface PostDetailType {
   id: number;
   slug: string;
   title: { rendered: string };
@@ -16,15 +20,17 @@ interface PostType {
   };
 }
 
-export default async function BeritaPage({ params }: PageProps) {
-  const res = await fetch(
-    `https://arara.rf.gd/wp-json/wp/v2/posts?slug=${params.slug}&_embed`,
-    { next: { revalidate: 60 } } // ISR: update tiap 60 detik
-  );
-  const data = await res.json();
-  const post: PostType = data[0];
+export default function PostDetail({ params }: Props) {
+  const { slug } = use(params);
+  const [post, setPost] = useState<PostDetailType | null>(null);
 
-  if (!post) return <h1 className="text-center mt-20 text-2xl">Post tidak ditemukan</h1>;
+  useEffect(() => {
+    fetch(`https://arara.rf.gd/wp-json/wp/v2/posts?slug=${slug}&_embed`)
+      .then((res) => res.json())
+      .then((data) => setPost(data[0]));
+  }, [slug]);
+
+  if (!post) return <p className="text-center py-8">Loading...</p>;
 
   return (
     <main className="container mx-auto px-6 py-8">
@@ -33,14 +39,22 @@ export default async function BeritaPage({ params }: PageProps) {
           src={post._embedded["wp:featuredmedia"][0].source_url}
           alt={post.title.rendered}
           className="w-full h-72 object-cover rounded-lg mb-6"
-          width={800}
-          height={400}
         />
       )}
 
-      <h1 dangerouslySetInnerHTML={{ __html: post.title.rendered }} className="text-3xl font-bold mb-4" />
+      <h1
+        dangerouslySetInnerHTML={{ __html: post.title.rendered }}
+        className="text-3xl font-bold mb-4"
+      />
       <div className="flex justify-between text-gray-400 text-sm mb-6">
         <span>{new Date(post.date).toLocaleDateString()}</span>
         <span>{post._embedded?.author?.[0]?.name}</span>
       </div>
-      <div className="prose max-w-full text-gray-200" dangerouslySetInnerHTML={{ __html: post.content.rendered }} />
+
+      <div
+        className="prose max-w-full text-gray-200"
+        dangerouslySetInnerHTML={{ __html: post.content.rendered }}
+      ></div>
+    </main>
+  );
+}
