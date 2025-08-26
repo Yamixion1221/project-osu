@@ -20,7 +20,8 @@
 }
 
 body {
-  background: var(--background);
+  background: var(--background) url('/images/background.jpg') no-repeat center center;
+  background-size: cover;
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }

@@ -25,7 +25,7 @@ export default function HomePage() {
 
   return (
     <main className="container mx-auto px-6 py-8 relative z-0">
-      <h2 className="bg-header text-2xl font-bold text-center py-2 mb-6">Berita</h2>
+      <h2 className="bg-black text-2xl font-bold text-center py-2 mb-6">Berita</h2>
 
       <div className="post-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 relative z-0">
         {posts.map(post => (
@@ -47,7 +47,7 @@ export default function HomePage() {
               </div>
             )}
 
-            <div className="p-4">
+            <div className="p-4 bg-black">
               <h3
                 dangerouslySetInnerHTML={{ __html: post.title.rendered }}
                 className="font-bold text-lg mb-2"

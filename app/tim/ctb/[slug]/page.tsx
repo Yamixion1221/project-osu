@@ -1,6 +1,7 @@
-"use client";
+"use client"; // HARUS di atas
 
-import { useEffect, useState, use } from "react";
+import { useEffect, useState } from "react";
+import { use } from "react";
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -19,22 +20,20 @@ interface PostDetailType {
 }
 
 export default function PostDetail({ params }: Props) {
-  const { slug } = use(params); // ✅ unwrap params pakai use()
+  const { slug } = use(params); // ambil slug dari URL
   const [post, setPost] = useState<PostDetailType | null>(null);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetch(`https://arara.rf.gd/wp-json/wp/v2/posts?slug=${slug}&_embed`)
       .then((res) => res.json())
-      .then((data) => setPost(data[0]))
-      .finally(() => setLoading(false));
+      .then((data) => setPost(data[0]));
   }, [slug]);
 
-  if (loading) return <p className="text-center py-8">Loading...</p>;
-  if (!post) return <p className="text-center py-8">Post tidak ditemukan.</p>;
+  if (!post) return <p className="text-center py-8">Loading...</p>;
 
   return (
     <main className="container mx-auto px-6 py-8">
+      {/* Featured image */}
       {post._embedded?.["wp:featuredmedia"]?.[0]?.source_url && (
         <img
           src={post._embedded["wp:featuredmedia"][0].source_url}

@@ -1,0 +1,25 @@
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Thread {
+  id        Int       @id @default(autoincrement())
+  title     String
+  content   String?   // opsional
+  imageUrl  String?   // opsional, bisa simpan path atau URL
+  comments  Comment[]
+  createdAt DateTime  @default(now())
+}
+
+model Comment {
+  id        Int      @id @default(autoincrement())
+  content   String
+  threadId  Int
+  thread    Thread   @relation(fields: [threadId], references: [id])
+  createdAt DateTime @default(now())
+}
