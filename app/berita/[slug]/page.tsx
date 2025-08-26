@@ -19,14 +19,12 @@ interface PostType {
 export default async function BeritaPage({ params }: PageProps) {
   const res = await fetch(
     `https://arara.rf.gd/wp-json/wp/v2/posts?slug=${params.slug}&_embed`,
-    { next: { revalidate: 60 } }
+    { next: { revalidate: 60 } } // ISR: update tiap 60 detik
   );
-  const data: PostType[] = await res.json();
-  const post = data[0];
+  const data = await res.json();
+  const post: PostType = data[0];
 
-  if (!post) {
-    return <h1 className="text-center mt-20 text-2xl">Halaman tidak ditemukan</h1>;
-  }
+  if (!post) return <h1 className="text-center mt-20 text-2xl">Post tidak ditemukan</h1>;
 
   return (
     <main className="container mx-auto px-6 py-8">
@@ -34,23 +32,15 @@ export default async function BeritaPage({ params }: PageProps) {
         <Image
           src={post._embedded["wp:featuredmedia"][0].source_url}
           alt={post.title.rendered}
+          className="w-full h-72 object-cover rounded-lg mb-6"
           width={800}
           height={400}
-          className="w-full h-72 object-cover rounded-lg mb-6"
         />
       )}
-      <h1
-        dangerouslySetInnerHTML={{ __html: post.title.rendered }}
-        className="text-3xl font-bold mb-4"
-      />
+
+      <h1 dangerouslySetInnerHTML={{ __html: post.title.rendered }} className="text-3xl font-bold mb-4" />
       <div className="flex justify-between text-gray-400 text-sm mb-6">
         <span>{new Date(post.date).toLocaleDateString()}</span>
         <span>{post._embedded?.author?.[0]?.name}</span>
       </div>
-      <div
-        className="prose max-w-full text-gray-200"
-        dangerouslySetInnerHTML={{ __html: post.content.rendered }}
-      />
-    </main>
-  );
-}
+      <div className="prose max-w-full text-gray-200" dangerouslySetInnerHTML={{ __html: post.content.rendered }} />
