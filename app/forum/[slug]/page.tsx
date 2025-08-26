@@ -3,7 +3,12 @@ import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
 interface Comment { id: number; content: string; }
-interface Thread { id: number; title: string; }
+interface Thread {
+  id: number;
+  title: string;
+  content?: string;
+  imageUrl?: string;
+}
 
 export default function ThreadPage() {
   const { slug } = useParams();
@@ -12,17 +17,18 @@ export default function ThreadPage() {
   const [comments, setComments] = useState<Comment[]>([]);
   const [newComment, setNewComment] = useState("");
 
-  // Polling otomatis tiap 2 detik
+  const fetchData = async () => {
+    const res = await fetch("/api/threads");
+    const threads: (Thread & { comments: Comment[] })[] = await res.json();
+    const t = threads.find((th) => th.id === threadId);
+    if (t) {
+      setThread({ id: t.id, title: t.title, content: t.content, imageUrl: t.imageUrl });
+      setComments(t.comments);
+    }
+  };
+
+  // Polling tiap 2 detik
   useEffect(() => {
-    const fetchData = async () => {
-      const res = await fetch("/api/threads");
-      const threads: (Thread & { comments: Comment[] })[] = await res.json();
-      const t = threads.find((th) => th.id === threadId);
-      if (t) {
-        setThread({ id: t.id, title: t.title });
-        setComments(t.comments);
-      }
-    };
     fetchData();
     const interval = setInterval(fetchData, 2000);
     return () => clearInterval(interval);
@@ -36,6 +42,7 @@ export default function ThreadPage() {
       body: JSON.stringify({ threadId, content: newComment }),
     });
     setNewComment("");
+    fetchData(); // langsung fetch ulang supaya komentar baru muncul
   };
 
   if (!thread) return <p>Loading...</p>;
@@ -43,13 +50,12 @@ export default function ThreadPage() {
   return (
     <div className="p-6">
       <div className="mb-4">
-  <h1 className="text-2xl font-bold">{thread.title}</h1>
-  {thread.content && <p className="mt-2">{thread.content}</p>}
-  {thread.imageUrl && (
-    <img src={thread.imageUrl} alt="Gambar Thread" className="mt-2 max-w-full rounded" />
-  )}
-</div>
-
+        <h1 className="text-2xl font-bold">{thread.title}</h1>
+        {thread.content && <p className="mt-2">{thread.content}</p>}
+        {thread.imageUrl && (
+          <img src={thread.imageUrl} alt="Gambar Thread" className="mt-2 max-w-full rounded" />
+        )}
+      </div>
 
       <div className="mb-6">
         <input
@@ -59,7 +65,10 @@ export default function ThreadPage() {
           onChange={(e) => setNewComment(e.target.value)}
           className="border p-2 mr-2"
         />
-        <button onClick={addComment} className="bg-green-500 text-white px-4 py-2 rounded">
+        <button
+          onClick={addComment}
+          className="bg-green-500 text-white px-4 py-2 rounded"
+        >
           Kirim
         </button>
       </div>
