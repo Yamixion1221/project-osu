@@ -35,7 +35,7 @@ export default function PostDetail({ params }: Props) {
     <main className="container mx-auto px-6 py-8">
       {/* Featured image */}
       {post._embedded?.["wp:featuredmedia"]?.[0]?.source_url && (
-        <img
+        <Image
           src={post._embedded["wp:featuredmedia"][0].source_url}
           alt={post.title.rendered}
           className="w-full h-72 object-cover rounded-lg mb-6"
