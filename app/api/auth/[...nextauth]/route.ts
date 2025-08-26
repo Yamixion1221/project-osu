@@ -33,8 +33,7 @@ function OsuProvider<P extends Record<string, unknown> = OsuProfile>(
   };
 }
 
-// Export authOptions supaya bisa di-import
-export const authOptions = {
+const authOptions = {
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,
@@ -46,6 +45,12 @@ export const authOptions = {
     }),
   ],
   secret: process.env.NEXTAUTH_SECRET,
+  pages: {
+    signIn: "/auth/signin", // opsional, kustom halaman login
+  },
+  session: {
+    strategy: "jwt",
+  },
 };
 
 const handler = NextAuth(authOptions);
