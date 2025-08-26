@@ -19,7 +19,7 @@ export async function generateStaticParams() {
   const res = await fetch(`https://arara.rf.gd/wp-json/wp/v2/pages`);
   const pages = await res.json();
 
-  return pages.map((page: any) => ({
+  return pages.map((page: unknown) => ({
     slug: page.slug,
   }));
 }
