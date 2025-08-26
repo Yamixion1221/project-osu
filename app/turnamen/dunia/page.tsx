@@ -20,24 +20,30 @@ export default function TurnamenDuniaPage() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchPosts = async () => {
-      try {
-        const res = await fetch(
-          "https://arara.rf.gd/wp-json/wp/v2/posts?categories=5&_embed"
-        );
-        if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
-        const data: Post[] = await res.json();
-        setPosts(data);
-      } catch (err: any) {
+  const fetchPosts = async () => {
+    try {
+      const res = await fetch(
+        "https://arara.rf.gd/wp-json/wp/v2/posts?categories=8&_embed"
+      );
+      if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+      const data: Post[] = await res.json();
+      setPosts(data);
+    } catch (err) {
+      // TypeScript sekarang menganggap 'err' bertipe 'unknown'
+      if (err instanceof Error) {
+        console.error("Fetch error:", err.message);
+        setError("Gagal memuat postingan.");
+      } else {
         console.error("Fetch error:", err);
         setError("Gagal memuat postingan.");
-      } finally {
-        setLoading(false);
       }
-    };
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    fetchPosts();
-  }, []);
+  fetchPosts();
+}, []);
 
   if (loading) return <p className="p-6">Loading...</p>;
   if (error) return <p className="p-6 text-red-500">{error}</p>;
