@@ -1,45 +1,73 @@
-// app/[slug]/page.tsx
-import React from "react";
+"use client"; // HARUS di atas
 
-interface WPPage {
+import { useEffect, useState, use } from "react";
+import Image from "next/image";
+
+interface Props {
+  params: Promise<{ slug: string }>;
+}
+
+interface PostDetailType {
+  id: number;
+  slug: string;
   title: { rendered: string };
   content: { rendered: string };
-  slug: string;
+  date: string;
+  _embedded?: {
+    author?: { name: string }[];
+    "wp:featuredmedia"?: { source_url: string }[];
+  };
 }
 
-async function getPage(slug: string): Promise<WPPage | null> {
-  const res = await fetch(`https://arara.rf.gd/wp-json/wp/v2/pages?slug=${slug}`, {
-    next: { revalidate: 60 }, // ISR: regenerate setiap 60 detik
-  });
-  if (!res.ok) return null;
-  const data: WPPage[] = await res.json();
-  return data[0] || null;
-}
+export default function PostDetail({ params }: Props) {
+  // Ambil slug dari URL
+  const { slug } = use(params);
 
-export async function generateStaticParams() {
-  const res = await fetch(`https://arara.rf.gd/wp-json/wp/v2/pages`);
-  if (!res.ok) return [];
-  const pages: WPPage[] = await res.json();
+  const [post, setPost] = useState<PostDetailType | null>(null);
 
-  return pages.map((page) => ({ slug: page.slug }));
-}
+  useEffect(() => {
+    const fetchPost = async () => {
+      try {
+        const res = await fetch(
+          `https://arara.rf.gd/wp-json/wp/v2/posts?slug=${slug}&_embed`
+        );
+        const data = await res.json();
+        setPost(data[0] || null);
+      } catch (error) {
+        console.error("Fetch error:", error);
+        setPost(null);
+      }
+    };
+    fetchPost();
+  }, [slug]);
 
-// Tidak ada import PageProps dari tempat lain!
-export default async function Page({ params }: { params: { slug: string } }) {
-  const page = await getPage(params.slug);
-
-  if (!page) {
-    return (
-      <h1 className="text-center mt-20 text-2xl">
-        Halaman tidak ditemukan
-      </h1>
-    );
-  }
+  if (!post) return <p className="text-center py-8">Loading...</p>;
 
   return (
-    <main className="prose mx-auto p-6">
-      <h1>{page.title.rendered}</h1>
-      <div dangerouslySetInnerHTML={{ __html: page.content.rendered }} />
+    <main className="container mx-auto px-6 py-8">
+      {/* Featured image */}
+      {post._embedded?.["wp:featuredmedia"]?.[0]?.source_url && (
+        <Image
+          src={post._embedded["wp:featuredmedia"][0].source_url}
+          alt={post.title.rendered}
+          width={800}
+          height={300}
+          className="w-full h-72 object-cover rounded-lg mb-6"
+        />
+      )}
+
+      <h1
+        dangerouslySetInnerHTML={{ __html: post.title.rendered }}
+        className="text-3xl font-bold mb-4"
+      />
+      <div className="flex justify-between text-gray-400 text-sm mb-6">
+        <span>{new Date(post.date).toLocaleDateString()}</span>
+        <span>{post._embedded?.author?.[0]?.name}</span>
+      </div>
+      <div
+        className="prose max-w-full text-gray-200"
+        dangerouslySetInnerHTML={{ __html: post.content.rendered }}
+      />
     </main>
   );
 }
