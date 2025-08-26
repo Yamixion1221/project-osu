@@ -60,7 +60,7 @@ export default function TimManiaPage() {
         className="block bg-gray-800 rounded-lg overflow-hidden hover:shadow-lg transform transition-transform duration-300 hover:scale-105"
       >
         {firstPost._embedded?.["wp:featuredmedia"]?.[0]?.source_url && (
-          <img
+          <Image
             src={firstPost._embedded["wp:featuredmedia"][0].source_url}
             alt={firstPost.title.rendered}
             className="w-full h-60 object-cover"
@@ -91,7 +91,7 @@ export default function TimManiaPage() {
               className="flex bg-gray-800 rounded-lg overflow-hidden hover:shadow-lg transform transition-transform duration-300 hover:scale-105"
             >
               {post._embedded?.["wp:featuredmedia"]?.[0]?.source_url && (
-                <img
+                <Image
                   src={post._embedded["wp:featuredmedia"][0].source_url}
                   alt={post.title.rendered}
                   className="w-32 h-32 object-cover flex-shrink-0"
