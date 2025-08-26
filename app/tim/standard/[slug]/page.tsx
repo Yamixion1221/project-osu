@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { use } from "react";
+import Image from "next/image";
 
 interface Props {
   params: Promise<{ slug: string }>;
