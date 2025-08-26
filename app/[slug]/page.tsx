@@ -1,38 +1,31 @@
+// app/[slug]/page.tsx
 import React from "react";
 
-// Tipe halaman WordPress
-interface WPPageDetail {
+interface WPPage {
   title: { rendered: string };
   content: { rendered: string };
+  slug: string;
 }
 
-// Ambil halaman WordPress berdasarkan slug
-async function getPage(slug: string): Promise<WPPageDetail | null> {
-  const res = await fetch(
-    `https://arara.rf.gd/wp-json/wp/v2/pages?slug=${slug}`,
-    { next: { revalidate: 60 } } // ISR
-  );
-
+async function getPage(slug: string): Promise<WPPage | null> {
+  const res = await fetch(`https://arara.rf.gd/wp-json/wp/v2/pages?slug=${slug}`, {
+    next: { revalidate: 60 }, // ISR: regenerate setiap 60 detik
+  });
   if (!res.ok) return null;
-  const data: WPPageDetail[] = await res.json();
+  const data: WPPage[] = await res.json();
   return data[0] || null;
 }
 
-// Generate path statis untuk pre-render waktu build
 export async function generateStaticParams() {
   const res = await fetch(`https://arara.rf.gd/wp-json/wp/v2/pages`);
   if (!res.ok) return [];
+  const pages: WPPage[] = await res.json();
 
-  const pages: { slug: string }[] = await res.json();
   return pages.map((page) => ({ slug: page.slug }));
 }
 
-// Halaman utama (async page)
-export default async function Page({
-  params,
-}: {
-  params: { slug: string };
-}) {
+// Tidak ada import PageProps dari tempat lain!
+export default async function Page({ params }: { params: { slug: string } }) {
   const page = await getPage(params.slug);
 
   if (!page) {
