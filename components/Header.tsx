@@ -19,10 +19,10 @@ export default function Header() {
       className="flex justify-between items-center px-6 py-4 bg-black relative z-50"
     >
       {/* Logo */}
-      <a href="/" className="flex items-center gap-2">
+      <Link href="/" className="flex items-center gap-2">
         <Image src="/logo.png" alt="Portal osu!" width={50} height={50} />
         <span className="text-xl font-bold">Portal osu! Indonesia</span>
-      </a>
+      </Link>
 
       {/* Menu */}
       <nav className="flex items-center gap-6">
